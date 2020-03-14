@@ -1,0 +1,23 @@
+modname := hid-glorious
+modver := 1.0
+
+DKMS := dkms
+DKMS_DEST := /usr/src/$(modname)-$(modver)
+
+all: install
+
+src_install:
+	mkdir -p '$(DKMS_DEST)'
+	cp Makefile hid-glorious.c hid-ids.h '$(DKMS_DEST)'
+	sed 's/#MODULE_VERSION#/$(modver)/' dkms.conf.in > '$(DKMS_DEST)/dkms.conf'
+
+build: src_install
+	$(DKMS) build -m $(modname) -v $(modver)
+
+install: build
+	$(DKMS) install -m $(modname) -v $(modver)
+
+uninstall:
+	$(DKMS) remove -m $(modname) -v $(modver) --all
+
+.PHONY: all src_install build install uninstall
